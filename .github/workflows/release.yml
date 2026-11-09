@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   release:
-    name: Build & Publish Release (1.21.x)
+    name: Build & Publish Release (1.21.4)
     runs-on: ubuntu-latest
 
     steps:
@@ -31,7 +31,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build 1.21.x
+      - name: Build 1.21.4
         run: ./gradlew build --no-daemon
 
       - name: Prepare versioned JARs

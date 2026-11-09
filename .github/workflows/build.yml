@@ -2,16 +2,16 @@ name: Build
 
 on:
   push:
-    branches: ["1.21.x"]
+    branches: ["1.21.4"]
   pull_request:
-    branches: ["1.21.x"]
+    branches: ["1.21.4"]
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: Build Minecraft 1.21.x (Java 21)
+    name: Build Minecraft 1.21.4 (Java 21)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -31,12 +31,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build 1.21.x mod
+      - name: Build 1.21.4 mod
         run: ./gradlew build --no-daemon
 
-      - name: Upload 1.21.x artifacts
+      - name: Upload 1.21.4 artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: jnlyrics-1.21.x-${{ github.sha }}
+          name: jnlyrics-1.21.4-${{ github.sha }}
           path: build/libs/*.jar
           if-no-files-found: error

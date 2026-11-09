@@ -3,7 +3,7 @@
 # 🎵 JNLyrics
 
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge&logo=fabric)
-![Minecraft](https://img.shields.io/badge/Minecraft-26.x%20%7C%201.21.x-brightgreen?style=for-the-badge&logo=minecraft)
+![Minecraft](https://img.shields.io/badge/Minecraft-26.2-brightgreen?style=for-the-badge&logo=minecraft)
 ![Environment](https://img.shields.io/badge/Environment-Client--Only-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
@@ -69,10 +69,10 @@ Press **`M`** anytime in-game to open the frosted glass settings modal:
 
 ## 📋 Requirements & Compatibility
 
-- **Minecraft**: `26.x` / `1.21.x`
+- **Minecraft**: `26.2`
 - **Mod Loader**: **Fabric Loader** (≥ 0.16.0)
 - **API**: **Fabric API**
-- **Java**: Java 21+ / Java 25
+- **Java**: Java 25
 - **OS**: Windows 10 / Windows 11 *(utilizes native Windows Media Telemetry)*
 - **Side**: **Client-Only** (100% safe to use on any vanilla or modded multiplayer server)
 

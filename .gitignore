@@ -1,0 +1,23 @@
+# Gradle
+.gradle/
+build/
+.loom/
+bin/
+run/
+out/
+
+# Logs & Temp
+*.log
+__pycache__/
+*.ps1
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.ipr
+*.iws
+
+# OS
+.DS_Store
+Thumbs.db

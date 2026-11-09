@@ -1,9 +1,10 @@
 name: Release
 
 on:
+  release:
+    types: [published]
   push:
     tags:
-      - "v*+26*"
       - "v*"
   workflow_dispatch:
 
@@ -37,7 +38,7 @@ jobs:
       - name: Prepare versioned JARs
         run: |
           mkdir -p release-jars
-          TAG_NAME="${{ github.ref_name }}"
+          TAG_NAME="${{ github.event.release.tag_name || github.ref_name }}"
           VERSION="${TAG_NAME#v}"
           
           JAR_26=$(ls build/libs/*.jar | grep -v -- "-sources.jar" | head -n 1)
@@ -52,13 +53,12 @@ jobs:
           prerelease: false
 
       - name: Publish to Modrinth
-        if: ${{ secrets.MODRINTH_TOKEN != '' }}
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
           modrinth-id: "jnlyrics"
-          version: "${{ github.ref_name }}+26.x"
-          name: "JNLyrics ${{ github.ref_name }} (Fabric 26.x)"
+          version: "${{ github.event.release.tag_name || github.ref_name }}+26.x"
+          name: "JNLyrics ${{ github.event.release.tag_name || github.ref_name }} (Fabric 26.x)"
           version-type: "release"
           changelog: "Official release of JNLyrics for Fabric. See full changelog at https://github.com/zeinzrtra/JNLyrics/releases"
           files: "release-jars/*.jar"

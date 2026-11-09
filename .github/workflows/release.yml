@@ -50,3 +50,25 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+
+      - name: Publish to Modrinth
+        if: ${{ secrets.MODRINTH_TOKEN != '' }}
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          modrinth-id: "jnlyrics"
+          version: "${{ github.ref_name }}+26.x"
+          name: "JNLyrics ${{ github.ref_name }} (Fabric 26.x)"
+          version-type: "release"
+          changelog: "Official release of JNLyrics for Fabric. See full changelog at https://github.com/zeinzrtra/JNLyrics/releases"
+          files: "release-jars/*.jar"
+          loaders: |
+            fabric
+          game-versions: |
+            26.1
+            26.1.1
+            26.1.2
+            26.2
+            26.3
+            26.4
+          fail-mode: warn

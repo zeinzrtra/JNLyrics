@@ -3,7 +3,6 @@
 # 🎵 JNLyrics
 
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge&logo=fabric)
-![Minecraft](https://img.shields.io/badge/Minecraft-26.2-brightgreen?style=for-the-badge&logo=minecraft)
 ![Environment](https://img.shields.io/badge/Environment-Client--Only-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 

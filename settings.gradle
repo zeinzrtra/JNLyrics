@@ -11,3 +11,5 @@ pluginManagement {
 
 rootProject.name = 'JNLyrics'
 
+include '26.x'
+include '1.21-modern'

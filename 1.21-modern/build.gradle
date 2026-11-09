@@ -56,8 +56,15 @@ remapJar {
         def outJar = archiveFile.get().asFile
         if (outJar.length() < 10000) {
             def devJar = tasks.jar.archiveFile.get().asFile
-            def mappingFile = file("${System.getProperty('user.home')}/.gradle/caches/fabric-loom/${project.minecraft_version}/net.fabricmc.yarn.${project.minecraft_version.replace('.', '_')}.${project.yarn_mappings}-v2/mappings.tiny")
-            def mcJar = file("${System.getProperty('user.home')}/.gradle/caches/fabric-loom/${project.minecraft_version}/minecraft-merged.jar")
+            if (!devJar.exists()) {
+                devJar = layout.buildDirectory.file("devlibs/${project.base.archivesName.get()}-${project.version}-dev.jar").get().asFile
+            }
+            def yarnSlug = "net.fabricmc.yarn.${project.minecraft_version.replace('.', '_')}.${project.yarn_mappings}-v2"
+            def mappingFile = file("${System.getProperty('user.home')}/.gradle/caches/fabric-loom/${project.minecraft_version}/${yarnSlug}/mappings.tiny")
+            def mcJar = file("${System.getProperty('user.home')}/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/${project.minecraft_version}-${yarnSlug}/minecraft-merged-${project.minecraft_version}-${yarnSlug}.jar")
+            if (!mcJar.exists()) {
+                mcJar = file("${System.getProperty('user.home')}/.gradle/caches/fabric-loom/${project.minecraft_version}/minecraft-merged.jar")
+            }
             
             def trJar = file("${System.getProperty('user.home')}/.gradle/caches/modules-2/files-2.1/net.fabricmc/tiny-remapper/0.10.4/1a36cbf58694950061b5bdf4c45de46b2014baf5/tiny-remapper-0.10.4.jar")
             def asmJars = fileTree("${System.getProperty('user.home')}/.gradle/caches/modules-2/files-2.1/org.ow2.asm") { include '**/*.jar' }.files.collect { it.absolutePath }.join(';')
@@ -65,7 +72,7 @@ remapJar {
             
             def cp = "${trJar.absolutePath};${asmJars};${mapJars}"
             
-            println "[JNLyrics] Post-remapping ${devJar.name} -> ${outJar.name} using TinyRemapper..."
+            println "[JNLyrics] Post-remapping ${devJar.name} -> ${outJar.name} using TinyRemapper with named Minecraft classpath..."
             if (outJar.exists()) outJar.delete()
             def proc = new ProcessBuilder("java", "-cp", cp, "net.fabricmc.tinyremapper.Main",
                     devJar.absolutePath, outJar.absolutePath, mappingFile.absolutePath,

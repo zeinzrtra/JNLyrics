@@ -66,7 +66,7 @@ public class JNLyricsMod implements ClientModInitializer {
             }
         });
 
-        WorldRenderEvents.AFTER_ENTITIES.register(LyricsWorldRenderer::render);
+        WorldRenderEvents.LAST.register(LyricsWorldRenderer::render);
         HudRenderCallback.EVENT.register(LyricsHudRenderer::render);
 
         LOGGER.info("[JNLyrics] JNLyrics initialized successfully!");

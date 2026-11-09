@@ -125,7 +125,7 @@ public class LyricsWorldRenderer {
             float textX = -textRenderer.getWidth(lineStr) / 2.0f;
             Text comp = Text.literal(lineStr);
 
-            // Exact standard Minecraft nametag draw (1 clean pass with NORMAL layer and 25% background)
+            // Exact standard Minecraft nametag draw (SEE_THROUGH so it is never occluded by grass/blocks, rendered in LAST)
             textRenderer.draw(
                     comp,
                     textX,
@@ -134,7 +134,7 @@ public class LyricsWorldRenderer {
                     false,
                     matrices.peek().getPositionMatrix(),
                     consumers,
-                    TextRenderer.TextLayerType.NORMAL,
+                    TextRenderer.TextLayerType.SEE_THROUGH,
                     bg,
                     0xF000F0
             );

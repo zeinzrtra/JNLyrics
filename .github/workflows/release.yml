@@ -12,15 +12,24 @@ permissions:
   contents: write
 
 jobs:
-  build-26:
-    name: Build 26.x (Java 25)
+  release:
+    name: Build & Publish All Versions
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout main branch
+      - name: Checkout 26.x (main branch)
         uses: actions/checkout@v4
         with:
           ref: main
+          path: src-26
 
+      - name: Checkout 1.21.4 branch
+        uses: actions/checkout@v4
+        with:
+          ref: 1.21.4
+          path: src-121
+
+      # 1. Compile 26.x with Java 25
       - name: Set up Java 25
         uses: actions/setup-java@v4
         with:
@@ -30,87 +39,39 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build 26.x
-        run: ./gradlew build --no-daemon
-
-      - name: Prepare 26.x JAR
+      - name: Build 26.x mod
         run: |
-          mkdir -p release-jars
+          cd src-26
+          chmod +x gradlew
+          ./gradlew build --no-daemon
+          mkdir -p ../release-jars
           TAG_NAME="${{ github.event.release.tag_name || github.ref_name }}"
           VERSION="${TAG_NAME#v}"
           JAR_26=$(ls build/libs/*.jar | grep -v -- "-sources.jar" | head -n 1)
-          cp "$JAR_26" "release-jars/jnlyrics-${VERSION}+26.x.jar"
+          cp "$JAR_26" "../release-jars/jnlyrics-${VERSION}+26.x.jar"
 
-      - name: Upload 26.x artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar-26
-          path: release-jars/*.jar
-
-  build-121:
-    name: Build 1.21.4 (Java 21)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 1.21.4 branch
-        uses: actions/checkout@v4
-        with:
-          ref: 1.21.4
-
+      # 2. Compile 1.21.4 with Java 21
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build 1.21.4
-        run: ./gradlew build --no-daemon
-
-      - name: Prepare 1.21.4 JAR
+      - name: Build 1.21.4 mod
         run: |
-          mkdir -p release-jars
+          cd src-121
+          chmod +x gradlew
+          ./gradlew build --no-daemon
           TAG_NAME="${{ github.event.release.tag_name || github.ref_name }}"
           VERSION="${TAG_NAME#v}"
           JAR_121=$(ls build/libs/*.jar | grep -v -- "-sources.jar" | head -n 1)
-          cp "$JAR_121" "release-jars/jnlyrics-${VERSION}+1.21.4.jar"
+          cp "$JAR_121" "../release-jars/jnlyrics-${VERSION}+1.21.4.jar"
 
-      - name: Upload 1.21.4 artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar-121
-          path: release-jars/*.jar
-
-  publish:
-    name: Publish to GitHub Releases & Modrinth
-    needs: [build-26, build-121]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create release-jars folder
-        run: mkdir -p release-jars
-
-      - name: Download 26.x JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: jar-26
-          path: release-jars
-
-      - name: Download 1.21.4 JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: jar-121
-          path: release-jars
-
-      - name: List collected JARs
+      # 3. Verify collected artifacts
+      - name: List collected release JARs
         run: ls -la release-jars/
 
+      # 4. Upload BOTH JARs to GitHub Release
       - name: Upload both JARs to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -119,6 +80,7 @@ jobs:
           draft: false
           prerelease: false
 
+      # 5. Publish 26.x to Modrinth
       - name: Publish 26.x to Modrinth
         uses: Kir-Antipov/mc-publish@v3.3
         with:
@@ -139,6 +101,7 @@ jobs:
             26.3
             26.4
 
+      # 6. Publish 1.21.4 to Modrinth
       - name: Publish 1.21.4 to Modrinth
         uses: Kir-Antipov/mc-publish@v3.3
         with:

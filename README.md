@@ -3,7 +3,7 @@
 # 🎵 JNLyrics
 
 ![Fabric](https://img.shields.io/badge/Loader-Fabric-blue?style=for-the-badge&logo=fabric)
-![Minecraft](https://img.shields.io/badge/Minecraft-26.2-brightgreen?style=for-the-badge&logo=minecraft)
+![Minecraft](https://img.shields.io/badge/Minecraft-26.x%20%7C%201.21.2--1.21.11-brightgreen?style=for-the-badge&logo=minecraft)
 ![Environment](https://img.shields.io/badge/Environment-Client--Only-orange?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-purple?style=for-the-badge)
 
@@ -67,13 +67,16 @@ Press **`M`** anytime in-game to open the frosted glass settings modal:
 
 ---
 
-## 📋 Requirements & Compatibility
+## 📋 Supported Minecraft Versions
 
-- **Minecraft**: `26.x` (`26.1` – `26.4`)  
-  *(For Minecraft `1.21.2` – `1.21.4`, switch to the [`1.21.4`](https://github.com/zeinzrtra/JNLyrics/tree/1.21.4) branch)*
+| Branch | Minecraft Versions | Java Runtime | Release Status |
+| :--- | :--- | :---: | :---: |
+| [**`main`**](https://github.com/zeinzrtra/JNLyrics) *(Default)* | **26.1, 26.2, 26.3, 26.4** (26.x) | Java 25 | Active / Latest |
+| [**`1.21.4`**](https://github.com/zeinzrtra/JNLyrics/tree/1.21.4) | **1.21.2, 1.21.3, 1.21.4, 1.21.5 – 1.21.11** | Java 21 | Active / LTS |
+
+### 🛠️ System Requirements
 - **Mod Loader**: **Fabric Loader** (≥ 0.16.0)
 - **API**: **Fabric API**
-- **Java**: Java 25
 - **OS**: Windows 10 / Windows 11 *(utilizes native Windows Media Telemetry)*
 - **Side**: **Client-Only** (100% safe to use on any vanilla or modded multiplayer server)
 

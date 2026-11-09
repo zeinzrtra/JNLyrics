@@ -48,6 +48,8 @@ public class LyricsWorldRenderer {
                 activeText = "§7Memuat lirik...";
             } else if (!lyricsMgr.hasLyrics()) {
                 activeText = "§6♪ §f" + track.getArtist() + " - " + track.getTitle();
+            } else if (nextLine != null && !nextLine.text().isBlank()) {
+                activeText = "§7♪ (Intro) §f" + nextLine.text().trim();
             } else {
                 prevActiveText = "";
                 return;
@@ -99,6 +101,10 @@ public class LyricsWorldRenderer {
             renderTextSentence(matrices, consumers, client.textRenderer, camera, nextLine.text().trim(),
                     posX, nextY, posZ, activeScale * 0.85f, "§7");
         }
+
+        if (consumers instanceof VertexConsumerProvider.Immediate immediate) {
+            immediate.draw();
+        }
     }
 
     private static void renderTextSentence(MatrixStack matrices, VertexConsumerProvider consumers,
@@ -110,7 +116,7 @@ public class LyricsWorldRenderer {
         matrices.push();
         matrices.translate(x, y, z);
         matrices.multiply(camera.getRotation());
-        matrices.scale(-scale, -scale, scale);
+        matrices.scale(scale, -scale, scale);
 
         for (int i = 0; i < lines.size(); i++) {
             matrices.push();

@@ -2,6 +2,8 @@ package net.jnlyrics.render;
 
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.jnlyrics.config.JNConfig;
+import net.jnlyrics.lyrics.LyricLine;
+import net.jnlyrics.lyrics.LyricsManager;
 import net.jnlyrics.media.MediaManager;
 import net.jnlyrics.media.TrackInfo;
 import net.minecraft.client.MinecraftClient;
@@ -24,15 +26,32 @@ public class LyricsHudRenderer {
         int screenWidth = context.getScaledWindowWidth();
         int centerX = screenWidth / 2;
 
-        // Header: Only Title - Artist (No lyrics in HUD)
+        long posMs = track.getEstimatedPositionMs();
+        LyricsManager lyricsMgr = LyricsManager.getInstance();
+        LyricLine currentLine = lyricsMgr.getCurrentLine(posMs);
+        LyricLine nextLine = lyricsMgr.getNextLine(posMs);
+
+        String lyricText = "";
+        if (currentLine != null && !currentLine.text().isBlank()) {
+            lyricText = currentLine.text().trim();
+        } else if (lyricsMgr.isLoading()) {
+            lyricText = "§7Memuat lirik...";
+        } else if (lyricsMgr.hasLyrics() && nextLine != null && !nextLine.text().isBlank()) {
+            lyricText = "§8♪ (Intro) §7" + nextLine.text().trim();
+        }
+
+        // Header: Title - Artist
         String songTitle = track.getArtist().isEmpty()
                 ? "§a♪ §f" + track.getTitle()
                 : "§a♪ §f" + track.getTitle() + " §7- " + track.getArtist();
-        int textWidth = font.getWidth(songTitle);
+        int titleWidth = font.getWidth(songTitle);
+        int lyricWidth = lyricText.isEmpty() ? 0 : font.getWidth(lyricText);
+        int maxContentWidth = Math.max(titleWidth, lyricWidth);
 
-        // Compact sleek pill dimensions
-        int pillWidth = Math.max(130, Math.min(textWidth + 20, screenWidth - 20));
-        int pillHeight = 17;
+        // Sleek dynamic pill dimensions
+        boolean hasLyricLine = !lyricText.isEmpty();
+        int pillWidth = Math.max(140, Math.min(maxContentWidth + 24, screenWidth - 20));
+        int pillHeight = hasLyricLine ? 29 : 17;
         int pillX = centerX - pillWidth / 2;
         int pillY = 5;
 
@@ -43,8 +62,14 @@ public class LyricsHudRenderer {
         // Title - Artist centered
         context.drawCenteredTextWithShadow(font, songTitle, centerX, pillY + 3, 0xFFFFFFFF);
 
+        // Active lyric line centered below title if available
+        if (hasLyricLine) {
+            int lyricColor = (config.glowColor != 0) ? (config.glowColor | 0xFF000000) : 0xFFFFD700;
+            context.drawCenteredTextWithShadow(font, lyricText, centerX, pillY + 14, lyricColor);
+        }
+
         // Real-time sleek progress bar at the bottom of the pill
-        long cur = track.getEstimatedPositionMs();
+        long cur = posMs;
         long dur = track.getDurationMs();
         float progress = dur > 0 ? Math.min(1.0f, Math.max(0.0f, (float) cur / dur)) : 0.0f;
 

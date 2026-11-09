@@ -48,8 +48,6 @@ public class LyricsWorldRenderer {
                 activeText = "§7Memuat lirik...";
             } else if (!lyricsMgr.hasLyrics()) {
                 activeText = "§6♪ §f" + track.getArtist() + " - " + track.getTitle();
-            } else if (nextLine != null && !nextLine.text().isBlank()) {
-                activeText = "§7♪ (Intro) §f" + nextLine.text().trim();
             } else {
                 prevActiveText = "";
                 return;
@@ -123,11 +121,14 @@ public class LyricsWorldRenderer {
             matrices.translate(0, i * 11.0f, 0);
             String lineStr = colorPrefix + lines.get(i);
             float textX = -textRenderer.getWidth(lineStr) / 2.0f;
+            Text textComponent = Text.literal(lineStr);
+
+            // 1. Background plate (dark semi-transparent box)
             textRenderer.draw(
-                    Text.literal(lineStr),
+                    textComponent,
                     textX,
                     0,
-                    0xFFFFFFFF,
+                    0x20FFFFFF,
                     false,
                     matrices.peek().getPositionMatrix(),
                     consumers,
@@ -135,6 +136,21 @@ public class LyricsWorldRenderer {
                     0x80000000,
                     0xF000F0
             );
+
+            // 2. Solid crisp foreground text (exact normal nametag layer, fully opaque & vibrant, not washed out by water/sky)
+            textRenderer.draw(
+                    textComponent,
+                    textX,
+                    0,
+                    0xFFFFFFFF,
+                    false,
+                    matrices.peek().getPositionMatrix(),
+                    consumers,
+                    TextRenderer.TextLayerType.NORMAL,
+                    0,
+                    0xF000F0
+            );
+
             matrices.pop();
         }
 
@@ -168,13 +184,15 @@ public class LyricsWorldRenderer {
         return lines;
     }
 
-    public static String getGlowPrefix(int color) {
-        return switch (color) {
-            case 0x00E5FF -> "§b§l"; // Neon Cyan
-            case 0xFFD700 -> "§6§l"; // Gold
-            case 0xD000FF -> "§d§l"; // Neon Purple
-            case 0x00FF88 -> "§a§l"; // Emerald Green
-            default -> "§f§l";       // Crystal White
-        };
+    private static String getGlowPrefix(int hexColor) {
+        int r = (hexColor >> 16) & 0xFF;
+        int g = (hexColor >> 8) & 0xFF;
+        int b = hexColor & 0xFF;
+
+        if (r > 200 && g > 180 && b < 100) return "§6"; // Gold
+        if (r < 100 && g > 200 && b > 200) return "§b"; // Cyan
+        if (r > 180 && g < 100 && b > 180) return "§d"; // Purple
+        if (r < 100 && g > 200 && b < 150) return "§a"; // Green
+        return "§f"; // White
     }
 }

@@ -2,49 +2,16 @@ name: Build
 
 on:
   push:
-    branches: ["main"]
+    branches: ["1.21.x"]
   pull_request:
-    branches: ["main"]
+    branches: ["1.21.x"]
 
 permissions:
   contents: read
 
 jobs:
-  build-26:
-    name: Build Minecraft 26.x (Java 25)
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java 25
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "25"
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.event_name == 'pull_request' }}
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build 26.x mod
-        run: |
-          cd 26.x
-          ../gradlew build --no-daemon
-
-      - name: Upload 26.x artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: jnlyrics-26.x-${{ github.sha }}
-          path: 26.x/build/libs/*.jar
-          if-no-files-found: error
-
-  build-121:
-    name: Build Minecraft 1.21-modern (Java 21)
+  build:
+    name: Build Minecraft 1.21.x (Java 21)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -64,14 +31,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build 1.21-modern mod
-        run: |
-          cd 1.21-modern
-          ../gradlew remapJar --no-daemon
+      - name: Build 1.21.x mod
+        run: ./gradlew build --no-daemon
 
-      - name: Upload 1.21-modern artifacts
+      - name: Upload 1.21.x artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: jnlyrics-1.21-modern-${{ github.sha }}
-          path: 1.21-modern/build/libs/*.jar
+          name: jnlyrics-1.21.x-${{ github.sha }}
+          path: build/libs/*.jar
           if-no-files-found: error

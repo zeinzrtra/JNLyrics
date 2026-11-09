@@ -9,7 +9,5 @@ pluginManagement {
     }
 }
 
-rootProject.name = 'JNLyrics'
+rootProject.name = 'jnlyrics'
 
-include '26.x'
-include '1.21-modern'

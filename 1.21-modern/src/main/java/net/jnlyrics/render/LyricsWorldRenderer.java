@@ -12,7 +12,6 @@ import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -65,13 +64,13 @@ public class LyricsWorldRenderer {
         VertexConsumerProvider consumers = context.consumers();
         if (matrices == null || camera == null || consumers == null) return;
 
-        Quaternionf rotation = camera.getRotation();
-        Vector3f fwd = rotation.transform(new Vector3f(0, 0, -1));
-        Vector3f up = rotation.transform(new Vector3f(0, 1, 0));
-        Vector3f right = rotation.transform(new Vector3f(1, 0, 0));
+        // In 1.21: getHorizontalPlane() = fwd, getVerticalPlane() = up, getDiagonalPlane() = left
+        Vector3f fwd = camera.getHorizontalPlane();
+        Vector3f up = camera.getVerticalPlane();
+        Vector3f left = camera.getDiagonalPlane(); // right is -left
 
         float distance = config.distance > 0 ? config.distance : 3.2f;
-        float baseScale = (config.scale > 0 ? config.scale : 0.56f) * 0.025f;
+        float baseScale = config.scale > 0 ? config.scale : 0.56f;
         String glowPrefix = getGlowPrefix(config.glowColor);
 
         // Render active line (Camera-relative, pops directly at designated left/right side)
@@ -80,9 +79,9 @@ public class LyricsWorldRenderer {
         float bobbing = ANIMATOR.getBobbingY();
         float floatUp = ANIMATOR.getFloatUpY();
 
-        double offX = (right.x() * sideX) + (up.x() * (sideY + bobbing + floatUp));
-        double offY = (right.y() * sideX) + (up.y() * (sideY + bobbing + floatUp));
-        double offZ = (right.z() * sideX) + (up.z() * (sideY + bobbing + floatUp));
+        double offX = (-left.x() * sideX) + (up.x() * (sideY + bobbing + floatUp));
+        double offY = (-left.y() * sideX) + (up.y() * (sideY + bobbing + floatUp));
+        double offZ = (-left.z() * sideX) + (up.z() * (sideY + bobbing + floatUp));
 
         double posX = fwd.x() * distance + offX;
         double posY = fwd.y() * distance + offY - 0.12;
@@ -113,19 +112,21 @@ public class LyricsWorldRenderer {
 
         matrices.push();
         matrices.translate(x, y, z);
-        matrices.multiply(camera.getRotation());
-        matrices.scale(scale, -scale, scale);
 
         for (int i = 0; i < lines.size(); i++) {
             matrices.push();
-            matrices.translate(0, i * 11.0f, 0);
+            // Explicit vertical separation in world space: 0.20 blocks between lines (never overlaps)
+            matrices.translate(0, -i * 0.20, 0);
+            matrices.multiply(camera.getRotation());
+            matrices.scale(scale * 0.025f, -scale * 0.025f, scale * 0.025f);
+
             String lineStr = colorPrefix + lines.get(i);
             float textX = -textRenderer.getWidth(lineStr) / 2.0f;
-            Text textComponent = Text.literal(lineStr);
+            Text comp = Text.literal(lineStr);
 
-            // 1. Background plate (dark semi-transparent box)
+            // 1. Individual nametag background shadow box
             textRenderer.draw(
-                    textComponent,
+                    comp,
                     textX,
                     0,
                     0x20FFFFFF,
@@ -137,9 +138,9 @@ public class LyricsWorldRenderer {
                     0xF000F0
             );
 
-            // 2. Solid crisp foreground text (exact normal nametag layer, fully opaque & vibrant, not washed out by water/sky)
+            // 2. Solid bold foreground text (crisp & opaque, exactly like 26.x submitNameTag)
             textRenderer.draw(
-                    textComponent,
+                    comp,
                     textX,
                     0,
                     0xFFFFFFFF,
@@ -184,15 +185,13 @@ public class LyricsWorldRenderer {
         return lines;
     }
 
-    private static String getGlowPrefix(int hexColor) {
-        int r = (hexColor >> 16) & 0xFF;
-        int g = (hexColor >> 8) & 0xFF;
-        int b = hexColor & 0xFF;
-
-        if (r > 200 && g > 180 && b < 100) return "§6"; // Gold
-        if (r < 100 && g > 200 && b > 200) return "§b"; // Cyan
-        if (r > 180 && g < 100 && b > 180) return "§d"; // Purple
-        if (r < 100 && g > 200 && b < 150) return "§a"; // Green
-        return "§f"; // White
+    public static String getGlowPrefix(int color) {
+        return switch (color) {
+            case 0x00E5FF -> "§b§l"; // Neon Cyan
+            case 0xFFD700 -> "§6§l"; // Gold
+            case 0xD000FF -> "§d§l"; // Neon Purple
+            case 0x00FF88 -> "§a§l"; // Emerald Green
+            default -> "§f§l";       // Crystal White
+        };
     }
 }

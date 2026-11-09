@@ -70,7 +70,7 @@ Press **`M`** anytime in-game to open the frosted glass settings modal:
 ## 📋 Requirements & Compatibility
 
 - **Minecraft**: `26.x` (`26.1` – `26.4`)  
-  *(For Minecraft `1.21.2` – `1.21.4`, switch to the [`1.21.x`](https://github.com/zeinzrtra/JNLyrics/tree/1.21.x) branch)*
+  *(For Minecraft `1.21.2` – `1.21.4`, switch to the [`1.21.4`](https://github.com/zeinzrtra/JNLyrics/tree/1.21.4) branch)*
 - **Mod Loader**: **Fabric Loader** (≥ 0.16.0)
 - **API**: **Fabric API**
 - **Java**: Java 25

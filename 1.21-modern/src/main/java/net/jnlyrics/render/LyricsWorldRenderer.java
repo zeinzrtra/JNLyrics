@@ -88,15 +88,16 @@ public class LyricsWorldRenderer {
         double posZ = fwd.z() * distance + offZ;
 
         float activeScale = ANIMATOR.getScale(baseScale) * (distance / 2.8f);
+        int bg = (int)(client.options.getTextBackgroundOpacity(0.25F) * 255.0F) << 24;
 
         renderTextSentence(matrices, consumers, client.textRenderer, camera, activeText,
-                posX, posY, posZ, activeScale, glowPrefix);
+                posX, posY, posZ, activeScale, glowPrefix, bg);
 
         // Render next line preview if enabled
         if (config.showNextLine && nextLine != null && !nextLine.text().isBlank()) {
             double nextY = posY - 0.32;
             renderTextSentence(matrices, consumers, client.textRenderer, camera, nextLine.text().trim(),
-                    posX, nextY, posZ, activeScale * 0.85f, "§7");
+                    posX, nextY, posZ, activeScale * 0.85f, "§7", bg);
         }
 
         if (consumers instanceof VertexConsumerProvider.Immediate immediate) {
@@ -107,7 +108,7 @@ public class LyricsWorldRenderer {
     private static void renderTextSentence(MatrixStack matrices, VertexConsumerProvider consumers,
                                            TextRenderer textRenderer, Camera camera, String text,
                                            double x, double y, double z,
-                                           float scale, String colorPrefix) {
+                                           float scale, String colorPrefix, int bg) {
         List<String> lines = wrapText(text, 26);
 
         matrices.push();
@@ -124,21 +125,7 @@ public class LyricsWorldRenderer {
             float textX = -textRenderer.getWidth(lineStr) / 2.0f;
             Text comp = Text.literal(lineStr);
 
-            // 1. Individual nametag background shadow box
-            textRenderer.draw(
-                    comp,
-                    textX,
-                    0,
-                    0x20FFFFFF,
-                    false,
-                    matrices.peek().getPositionMatrix(),
-                    consumers,
-                    TextRenderer.TextLayerType.SEE_THROUGH,
-                    0x80000000,
-                    0xF000F0
-            );
-
-            // 2. Solid bold foreground text (crisp & opaque, exactly like 26.x submitNameTag)
+            // Exact standard Minecraft nametag draw (1 clean pass with NORMAL layer and 25% background)
             textRenderer.draw(
                     comp,
                     textX,
@@ -148,7 +135,7 @@ public class LyricsWorldRenderer {
                     matrices.peek().getPositionMatrix(),
                     consumers,
                     TextRenderer.TextLayerType.NORMAL,
-                    0,
+                    bg,
                     0xF000F0
             );
 
